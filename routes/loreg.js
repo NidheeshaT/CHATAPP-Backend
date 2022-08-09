@@ -30,12 +30,10 @@ router.post("/register",auth,async(req,res)=>{
     else{
         try{
             
-            user=await User.create(req.body).then(()=>{
-                console.log("Document inserted")
-            })           
+            user=await User.create(req.body)  
             req.session.userId=user._id;
             req.session.nickname=user.nickname;
-            msg=req.body
+            msg=await User.userInfo(user._id)
         }
         catch(e){
             console.log(e.message)

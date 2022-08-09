@@ -6,10 +6,11 @@ const handleRequests=require('../controllers/requests')
 router.post("/people",async(req,res)=>{
     try{
         let lim=10
-        let users=await User.public(req.body.username).limit(lim)
+        let users=await User.public(req.body.username,req.session.userId).limit(lim)
         res.send(users)
     }
-    catch{
+    catch(e){
+        console.log(e)
         res.send({error:"Bad request"})
     }
 })
@@ -81,7 +82,7 @@ router.post("/requests/reject",async(req,res)=>{
 
         if(i1!=-1 && i2!=-1)
         {
-            user.requestRecieved.pop( i1) 
+            user.requestRecieved.pop(i1) 
             friend.requestSent.pop(i2)
             await user.save()
             await friend.save()
@@ -101,13 +102,14 @@ router.post("/requests/cancel",async(req,res)=>{
     try{
         let user=req.user
         let friend=req.friend
+        console.log(user.requestSent,friend.requestRecieved)
         let i1=user.requestSent.indexOf(friend._id)
         let i2=friend.requestRecieved.indexOf(user._id)
-    
+        // console.log(i1,i2)
         if(i1!=-1 && i2!=-1)
         {
-            user.requestSent.pop(i1) 
-            friend.requestRecieved.pop(i2)
+            user.requestSent.slice(i1,1) 
+            friend.requestRecieved.slice(i2,1)
             await user.save()
             await friend.save()
             res.send(await User.userInfo(user._id))
@@ -140,7 +142,7 @@ router.post("/requests/send",async(req,res)=>{
         }
         friend.requestRecieved.push(user._id)
         user.requestSent.push(friend._id)
-
+        console.log(friend.requestRecieved,user.requestSent)
         await user.save()
         await friend.save()
         res.send(await User.userInfo(user._id))

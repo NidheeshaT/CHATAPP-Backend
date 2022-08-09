@@ -3,6 +3,7 @@ const handleRequests=async (req,res,next)=>{
     try{
         req.user=await User.findByNickname(req.session.nickname)
         req.friend=await User.findByNickname(req.body.friendname)
+        // console.log(req.friend)
         next()
     }
     catch{

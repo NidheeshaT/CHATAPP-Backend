@@ -7,10 +7,15 @@ const mongoose = require('mongoose');
 const mainroutes=require("./routes/loreg")
 const peopleroutes=require("./routes/people")
 const sessionMidware=require("./controllers/sessionController.js")
-mongoose.connect('mongodb://localhost:27017/ChatApp').then(()=>{
+require('dotenv').config()
+
+// console.log(typeof(process.env.CONNECT_DB_URL))
+// mongoose.connect('mongodb://localhost:27017/ChatApp').then(()=>{
+//   console.log("connection done");
+// });
+mongoose.connect(process.env.CONNECT_DB_URL||'mongodb://localhost:27017/ChatApp').then(()=>{
   console.log("connection done");
 });
-const port=80
 app.use(cors(
   {
     origin: 'http://localhost:3000',
@@ -27,6 +32,6 @@ app.use(peopleroutes)
 const server = http.createServer(app);
 sockets(server)
 
-server.listen(port, () => {
+server.listen(process.env.PORT||80, () => {
   console.log('listening on http://localhost:80');
 });
