@@ -51,7 +51,7 @@ router.post("/login",auth,async(req,res,next)=>{
         req.session.nickname=user.nickname;
         user=await User.userInfo(user._id)
         res.send(user)
-        console.log(req.session)
+        // console.log(req.session)
    }
     else{
         res.send({error:"Incorrect username or password"})

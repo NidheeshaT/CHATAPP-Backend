@@ -1,7 +1,9 @@
 const { Router } = require('express');
 let router=Router()
 const User=require("../models/Users")
+const UserSocketsModel=require("../models/UserSockets")
 const handleRequests=require('../controllers/requests')
+const {connect,io} =require("../controllers/sockets")
 
 router.post("/people",async(req,res)=>{
     try{
@@ -24,11 +26,12 @@ router.post("/friends/remove",async(req,res)=>{
         let i2=friend.friends.indexOf(user._id)
         if(i1!=-1 && i2!=-1)
         {
-            friend.friends.pop(i2)
-            user.friends.pop(i1)
+            friend.friends.splice(i2,1)
+            user.friends.splice(i1,1)
             await friend.save()
             await user.save()
             res.send(await User.userInfo(user._id))
+            io.to
         }
         else
         {
@@ -48,21 +51,30 @@ router.post("/requests/accept",async(req,res)=>{
         let friend=req.friend
         let i1=user.requestRecieved.indexOf(friend._id)
         let i2=friend.requestSent.indexOf(user._id)
+        let response={error:"BAd request"}
 
         if(i1!=-1 && i2!=-1)
         {
             user.friends.push(friend._id)
             friend.friends.push(user._id)
-            user.requestRecieved.pop(i1) 
-            friend.requestSent.pop(i2)
+            user.requestRecieved.splice(i1,1) 
+            friend.requestSent.splice(i2,1)
             await friend.save()
             await user.save()
-            res.send(await User.userInfo(user._id))
+            response=await User.userInfo(user._id)
         }
-        else
+
+        i1=user.requestSent.indexOf(friend._id)
+        i2=friend.requestRecieved.indexOf(user._id)
+        if(i1!=-1 && i2!=-1)
         {
-            res.send({error:"BAd request"})
+            user.requestSent.splice(i1,1) 
+            friend.requestRecieved.splice(i2,1)
+            await friend.save()
+            await user.save()
+            response=await User.userInfo(user._id)
         }
+        res.send(response)
     }
     catch(e)
     {
@@ -82,8 +94,8 @@ router.post("/requests/reject",async(req,res)=>{
 
         if(i1!=-1 && i2!=-1)
         {
-            user.requestRecieved.pop(i1) 
-            friend.requestSent.pop(i2)
+            user.requestRecieved.splice(i1,1) 
+            friend.requestSent.splice(i2,1)
             await user.save()
             await friend.save()
             res.send(await User.userInfo(user._id))
@@ -105,11 +117,10 @@ router.post("/requests/cancel",async(req,res)=>{
         console.log(user.requestSent,friend.requestRecieved)
         let i1=user.requestSent.indexOf(friend._id)
         let i2=friend.requestRecieved.indexOf(user._id)
-        // console.log(i1,i2)
         if(i1!=-1 && i2!=-1)
         {
-            user.requestSent.slice(i1,1) 
-            friend.requestRecieved.slice(i2,1)
+            user.requestSent.splice(i1,1) 
+            friend.requestRecieved.splice(i2,1)
             await user.save()
             await friend.save()
             res.send(await User.userInfo(user._id))
