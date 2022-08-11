@@ -5,7 +5,8 @@ const connect=(server)=>{
   const socket = require("socket.io");
   const io = socket(server,{
     cors:{
-    origin: 'http://localhost:3000',
+    // origin: 'http://localhost:3000',
+    origin: (origin,callback)=>{return callback(null,true)},
     credentials:true
     }
   });
