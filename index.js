@@ -18,7 +18,7 @@ mongoose.connect(process.env.CONNECT_DB_URL||'mongodb://localhost:27017/ChatApp'
 });
 app.use(cors(
   {
-    origin: 'http://localhost:3000',
+    origin: (origin,callback)=>{callback(null,true)},
     credentials:true
   }
 ))
