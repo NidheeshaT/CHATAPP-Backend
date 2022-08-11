@@ -19,7 +19,9 @@ const connect=(server)=>{
     
     io.on("connection",async (socket) => {
       console.log("hi")
-      let user=await UserSocketsModel.findOne({nickname:socket.request.session.nickname})
+      let user=null
+      if(socket.request.session.nickname)
+        user=await UserSocketsModel.findOne({nickname:socket.request.session.nickname})
       if(user)
       {
         user.socketID=socket.id
