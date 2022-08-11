@@ -3,7 +3,6 @@ let router=Router()
 const User=require("../models/Users")
 const UserSocketsModel=require("../models/UserSockets")
 const handleRequests=require('../controllers/requests')
-const {connect,io} =require("../controllers/sockets")
 
 router.post("/people",async(req,res)=>{
     try{

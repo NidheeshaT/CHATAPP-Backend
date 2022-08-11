@@ -8,10 +8,10 @@ const sessionMidware=session({
     resave: false,
     saveUninitialized: false,
     cookie:{
-      // sameSite:"none",
+      sameSite:"none",
       maxAge:Time,
-      // httpOnly:true,
-      // secure:true
+      httpOnly:true,
+      secure:true
     },
     // store:new MongoStore({uri:'mongodb://localhost:27017/ChatApp',collection:"mySessions"})
     store:new MongoStore({uri:process.env.CONNECT_DB_URL||'mongodb://localhost:27017/ChatApp',collection:"mySessions"})
