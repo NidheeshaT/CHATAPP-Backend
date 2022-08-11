@@ -3,6 +3,7 @@ const sessionMidware=require("./sessionController")
 
 const connect=(server)=>{
   const socket = require("socket.io");
+  console.log("hi")
   const io = socket(server,{
     cors:{
     // origin: 'http://localhost:3000',
@@ -10,12 +11,14 @@ const connect=(server)=>{
     credentials:true
     }
   });
+  console.log("hi")
     io.use( (socket, next)=> {
       sessionMidware(socket.request, {}, next);
     });
 
     
     io.on("connection",async (socket) => {
+      console.log("hi")
       let user=await UserSocketsModel.findOne({nickname:socket.request.session.nickname})
       if(user)
       {
