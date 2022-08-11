@@ -28,7 +28,8 @@ const connect=(server)=>{
         await user.save()
       }
       else{
-        await UserSocketsModel.create({nickname:socket.request.session.nickname,socketID:socket.id})
+        if(socket.request.session.nickname)
+          await UserSocketsModel.create({nickname:socket.request.session.nickname,socketID:socket.id})
 
       }
 
