@@ -16,6 +16,8 @@ require('dotenv').config()
 mongoose.connect(process.env.CONNECT_DB_URL||'mongodb://localhost:27017/ChatApp').then(()=>{
   console.log("connection done");
 });
+
+app.set("trust proxy",1)
 app.use(cors(
   {
     origin: (origin,callback)=>{return callback(null,true)},
