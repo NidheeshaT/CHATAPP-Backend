@@ -9,10 +9,6 @@ const peopleroutes=require("./routes/people")
 const sessionMidware=require("./controllers/sessionController.js")
 require('dotenv').config()
 
-// console.log(typeof(process.env.CONNECT_DB_URL))
-// mongoose.connect('mongodb://localhost:27017/ChatApp').then(()=>{
-//   console.log("connection done");
-// });
 mongoose.connect(process.env.CONNECT_DB_URL||'mongodb://localhost:27017/ChatApp').then(()=>{
   console.log("connection done");
 });

@@ -2,6 +2,8 @@ const { Router } = require('express');
 let router=Router()
 const User=require("../models/Users")
 const auth=require("../controllers/auth")
+const bcrypt=require("bcrypt")
+const saltRounds=11
 
 router.post("/checknickname",async(req,res)=>{
     if(await User.findByNickname(req.body.nickname))
@@ -29,7 +31,7 @@ router.post("/register",auth,async(req,res)=>{
         msg={error:"Nickname taken"}
     else{
         try{
-            
+            req.body.password=await bcrypt.hash(req.body.password,saltRounds)
             user=await User.create(req.body)  
             req.session.userId=user._id;
             req.session.nickname=user.nickname;
@@ -45,15 +47,19 @@ router.post("/register",auth,async(req,res)=>{
 })
 router.post("/login",auth,async(req,res,next)=>{
     let user=await User.findByEmail(req.body.email)
-    if(user && user.password==req.body.password)
-    {
-        req.session.userId=user._id;
-        req.session.nickname=user.nickname;
-        user=await User.userInfo(user._id)
-        res.send(user)
-        // console.log(req.session)
-   }
-    else{
+    try{
+        if(user && await bcrypt.compare(req.body.password,user.password))
+        {
+            req.session.userId=user._id;
+            req.session.nickname=user.nickname;
+            user=await User.userInfo(user._id)
+            res.send(user)
+        }
+        else{
+            res.send({error:"Incorrect username or password"})
+        }
+    }
+    catch(e){
         res.send({error:"Incorrect username or password"})
     }
 })
