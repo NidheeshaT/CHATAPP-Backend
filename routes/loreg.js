@@ -4,6 +4,7 @@ const User=require("../models/Users")
 const auth=require("../controllers/auth")
 const bcrypt=require("bcrypt")
 const saltRounds=11
+const sendMail=require("../controllers/email")
 
 router.post("/checknickname",async(req,res)=>{
     if(await User.findByNickname(req.body.nickname))
@@ -18,6 +19,12 @@ router.post("/checkemail",async(req,res)=>{
         msg={error:"Email taken"}
     else{
         msg=req.body
+        let str=""
+        for(let i=0;i<6;i++)
+        {
+            str+=Math.floor(Math.random()*10)
+        }
+        sendMail(req.body.email,str)
     }
     res.send(msg)
 })

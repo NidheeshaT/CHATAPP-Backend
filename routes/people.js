@@ -3,6 +3,7 @@ let router=Router()
 const User=require("../models/Users")
 const UserSocketsModel=require("../models/UserSockets")
 const handleRequests=require('../controllers/requests')
+const {update}=require('../controllers/sockets')
 
 router.post("/people",async(req,res)=>{
     try{
@@ -29,8 +30,8 @@ router.post("/friends/remove",async(req,res)=>{
             user.friends.splice(i1,1)
             await friend.save()
             await user.save()
+            update(friend.nickname)
             res.send(await User.userInfo(user._id))
-            io.to
         }
         else
         {
@@ -73,6 +74,7 @@ router.post("/requests/accept",async(req,res)=>{
             await user.save()
             response=await User.userInfo(user._id)
         }
+        update(friend.nickname)
         res.send(response)
     }
     catch(e)
@@ -97,6 +99,7 @@ router.post("/requests/reject",async(req,res)=>{
             friend.requestSent.splice(i2,1)
             await user.save()
             await friend.save()
+            update(friend.nickname)
             res.send(await User.userInfo(user._id))
         }
         else
@@ -113,7 +116,6 @@ router.post("/requests/cancel",async(req,res)=>{
     try{
         let user=req.user
         let friend=req.friend
-        console.log(user.requestSent,friend.requestRecieved)
         let i1=user.requestSent.indexOf(friend._id)
         let i2=friend.requestRecieved.indexOf(user._id)
         if(i1!=-1 && i2!=-1)
@@ -122,6 +124,7 @@ router.post("/requests/cancel",async(req,res)=>{
             friend.requestRecieved.splice(i2,1)
             await user.save()
             await friend.save()
+            update(friend.nickname)
             res.send(await User.userInfo(user._id))
         }
         else
@@ -152,12 +155,13 @@ router.post("/requests/send",async(req,res)=>{
         }
         friend.requestRecieved.push(user._id)
         user.requestSent.push(friend._id)
-        console.log(friend.requestRecieved,user.requestSent)
         await user.save()
         await friend.save()
+        update(friend.nickname)
         res.send(await User.userInfo(user._id))
     }
     catch(e){
+        console.log(e.message)
         res.send({error:"Bad request"})
     }
 })

@@ -1,10 +1,10 @@
 const UserSocketsModel=require('../models/UserSockets')
 const sessionMidware=require("./sessionController")
+const socket = require("socket.io");
+let io;
 
 const connect=(server)=>{
-  const socket = require("socket.io");
-  console.log("hi")
-  const io = socket(server,{
+  io = socket(server,{
     cors:{
     origin: (origin,callback)=>{return callback(null,true)},
     credentials:true
@@ -44,7 +44,16 @@ const connect=(server)=>{
       await UserSocketsModel.findOneAndDelete({nickname:socket.request.session.nickname})
     })
     });
-    
 }
 
-module.exports=connect;
+const update= async(to)=>{
+  try{
+    const friend=await UserSocketsModel.findOne({nickname:to})
+    io.to(friend.socketID).emit("refetch");
+  }
+  catch{
+    
+  }
+}
+
+module.exports={connect:connect,update:update};

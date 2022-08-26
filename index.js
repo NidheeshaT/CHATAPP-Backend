@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const cors = require("cors");
-const sockets = require('./controllers/sockets');
+const {connect} = require('./controllers/sockets');
 const mongoose = require('mongoose');
 const mainroutes=require("./routes/loreg")
 const peopleroutes=require("./routes/people")
@@ -28,7 +28,7 @@ app.use(mainroutes)
 app.use(peopleroutes)
 
 const server = http.createServer(app);
-sockets(server)
+connect(server)
 
 server.listen(process.env.PORT||80, () => {
   console.log('listening on http://localhost:80');
