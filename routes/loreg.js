@@ -75,5 +75,14 @@ router.post("/info",auth,async(req,res)=>{
     res.send({error:"No cookie"})
 })
 
+router.post("/logout",async(req,res)=>{
+    try{
+        req.session.destroy()
+        res.send({success:"logged out"})
+    }
+    catch{
+        res.send({error:"Bad request"})
+    }
+})
 
 module.exports=router
