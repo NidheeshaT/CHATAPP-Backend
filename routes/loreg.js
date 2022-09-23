@@ -5,6 +5,7 @@ const auth=require("../controllers/auth")
 const bcrypt=require("bcrypt")
 const saltRounds=11
 const sendMail=require("../controllers/email")
+const Email=require("../models/EmailVerify")
 
 router.post("/checknickname",async(req,res)=>{
     if(await User.findByNickname(req.body.nickname))
@@ -19,15 +20,67 @@ router.post("/checkemail",async(req,res)=>{
         msg={error:"Email taken"}
     else{
         msg=req.body
-        let str=""
+        let code=""
         for(let i=0;i<6;i++)
         {
-            str+=Math.floor(Math.random()*10)
+            code+=Math.floor(Math.random()*9 +1)
         }
-        sendMail(req.body.email,str)
+        try{
+            const e=await Email.findOne({email:req.body.email})
+            if(e)
+            {
+                if(e.trys==3)
+                    msg={error:"Exceeded number of tries,try again after sometime"}
+                else{
+                    e.code=code;
+                    await e.save()
+                }
+            }
+            else{
+                Email.create({email:req.body.email,code:code})
+            }
+
+            sendMail(req.body.email,code)
+        }
+        catch(er)
+        {
+            console.log(er.message)
+            msg={error:"Bad request"}
+        }
+        
     }
     res.send(msg)
 })
+
+router.post("/checkcode",async(req,res)=>{
+    let msg=req.body
+    try{
+        const e =await Email.findOne({email:req.body.email})
+        if(e)
+        {
+            if(e.trys===3)
+                msg={error:"Exceeded number of tries,try again after sometime"}
+            else if(req.body.code==e.code)
+            {
+                
+            }
+            else{
+                e.trys+=1
+                await e.save()
+                msg={error:"Incorrect"}
+            }
+        }
+        else{
+            msg={error:"Bad request"}
+        }
+    }
+    catch{
+        msg={error:"Bad request"}
+    }
+
+    res.send(msg)
+})
+
 
 router.post("/register",auth,async(req,res)=>{
     let msg={}
