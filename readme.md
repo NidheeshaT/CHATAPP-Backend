@@ -5,7 +5,6 @@ Backend for Chat Application bulit using MERN and Socket.io.
 - [Mongoose](https://mongoosejs.com/)
 - [Mongo](https://www.mongodb.com/)
 - [Socket.io](https://socket.io/)
-- [Mailslurp](https://www.mailslurp.com/)
 - Deployed on [Heroku](https://www.heroku.com/)
 
 # Installation
