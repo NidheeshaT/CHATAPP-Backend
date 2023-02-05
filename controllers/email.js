@@ -13,7 +13,7 @@ async function sendMail(to,code){
       method:'POST',
       body:JSON.stringify({
         type:"sendEmail",
-        key:process.env.key,
+        key:process.env.KEY,
         email:email
       })
     })
